@@ -1,51 +1,51 @@
 ---
-title: WhisperX Transcriptor Pro
-emoji: 🎙️
+title: WhisperX Transcriptor
+emoji: 🎙
 colorFrom: blue
-colorTo: indigo
+colorTo: gray
 sdk: gradio
 app_file: app.py
 pinned: false
 license: mit
 ---
 
-# 🎙️ WhisperX Transcriptor Pro
+# WhisperX Audio Transcriptor & Diarization Pipeline
 
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces%20Live%20Demo-blue)](https://huggingface.co/spaces/Klopezxd/transcriptor-whisperx)
 ![Python](https://img.shields.io/badge/Python-3.10-3776AB.svg?logo=python&logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch-2.8-EE4C2C.svg?logo=pytorch&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C.svg?logo=pytorch&logoColor=white)
 ![CUDA](https://img.shields.io/badge/CUDA-12.x-76B900.svg?logo=nvidia&logoColor=white)
+![Linter](https://img.shields.io/badge/Linter-Ruff-000000.svg?logo=ruff&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
-![Code Style](https://img.shields.io/badge/Code%20Style-Clean%20Code-brightgreen.svg)
 
-> **High-fidelity multimedia transcription pipeline featuring word-level phoneme alignment and multi-speaker diarization using WhisperX and Pyannote Audio.**
+> High-throughput speech transcription pipeline featuring word-level phoneme alignment and speaker diarization using WhisperX and Pyannote Audio.
 
 *Leer este documento en Español: [README.es.md](README.es.md)*
 
 ---
 
-## 🌟 Key Capabilities
+## Key Features
 
-* 🚀 **High-Throughput ASR:** Powered by **WhisperX** (faster-whisper / CTranslate2), delivering up to $5\times$ speedups over vanilla Whisper implementations.
-* 🎯 **Word-Level Phoneme Alignment:** Incorporates **Wav2Vec2** acoustic models to achieve exact word-boundary timestamp alignment.
-* 👥 **Speaker Diarization:** Identifies and segments discrete speakers seamlessly using **Pyannote Audio 3.1**.
-* ⚡ **Consumer GPU & ZeroGPU Ready:** Architected with `INT8` quantization and aggressive VRAM garbage collection between pipeline stages, running comfortably on 4GB VRAM cards (e.g., NVIDIA GeForce GTX 1650) as well as **Hugging Face ZeroGPU** runners.
-* 🖥️ **Dual Interface (Web + CLI):**
-  * **Web UI (Gradio):** Interactive web application.
+* **High-Throughput ASR:** Powered by **WhisperX** (faster-whisper / CTranslate2), delivering up to $5\times$ speedups over vanilla Whisper implementations.
+* **Word-Level Phoneme Alignment:** Incorporates **Wav2Vec2** acoustic models to achieve exact word-boundary timestamp alignment.
+* **Speaker Diarization:** Identifies and segments discrete speakers seamlessly using **Pyannote Audio 3.1**.
+* **Consumer GPU & ZeroGPU Ready:** Architected with `INT8` quantization and explicit VRAM garbage collection between pipeline stages, running efficiently on 4GB VRAM cards (e.g., NVIDIA GeForce GTX 1650) as well as **Hugging Face ZeroGPU** runners.
+* **Dual Interface (Web + CLI):**
+  * **Web UI (Gradio):** Interactive browser application.
   * **CLI (Terminal):** Fully featured command-line interface with interactive graphical file picker fallback.
-* 🔒 **Software Engineering Rigor:** Built following Clean Code principles, explicit type hints, structured logging, decoupled domain logic, and secure environment-based credential handling.
+* **Production Engineering:** Explicit type hints, structured logging, decoupled domain logic, and secure environment-based credential handling.
 
 ---
 
-## 🌐 Live Interactive Demo
+## Live Interactive Demo
 
-Test the model in the cloud without local configuration:
+Test the pipeline directly on Hugging Face Spaces:
 
 👉 **[Launch on Hugging Face Spaces: Klopezxd/transcriptor-whisperx](https://huggingface.co/spaces/Klopezxd/transcriptor-whisperx)**
 
 ---
 
-## 🏗️ Pipeline Architecture
+## Pipeline Architecture
 
 The transcription workflow executes across 5 isolated stages, clearing GPU VRAM at each boundary to prevent Out-Of-Memory (OOM) faults:
 
@@ -63,7 +63,7 @@ flowchart TD
 
 ---
 
-## 📋 System Requirements
+## System Requirements
 
 * **OS:** Windows 10/11 or Linux (Ubuntu 20.04+).
 * **Python:** 3.10 (recommended).
@@ -72,7 +72,7 @@ flowchart TD
 
 ---
 
-## 🚀 Local Installation
+## Installation & Setup
 
 ### Conda Environment (Recommended)
 
@@ -97,7 +97,7 @@ python -c "import torch; print('CUDA Ready:', torch.cuda.is_available())"
 
 ---
 
-## 🔑 Hugging Face Authentication (For Diarization)
+## Hugging Face Authentication (Speaker Diarization)
 
 Speaker diarization leverages gated models from Pyannote. To enable it:
 
@@ -115,7 +115,7 @@ Speaker diarization leverages gated models from Pyannote. To enable it:
 
 ---
 
-## 💻 Usage Guide
+## Usage
 
 ### 1. Web Application
 
@@ -156,7 +156,7 @@ python cli.py -i "meeting.wav" --timestamps range -o "./transcripts"
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 whisperx-transcriptor/
@@ -178,13 +178,13 @@ whisperx-transcriptor/
 ├── .gitignore                   # Strict exclusions for artifacts and large media
 ├── pyproject.toml               # Modern packaging metadata & Ruff configuration
 ├── LICENSE                      # MIT License
-├── README.md                    # Documentation in Spanish
-└── README.en.md                 # Documentation in English
+├── README.md                    # English documentation (Primary)
+└── README.es.md                 # Spanish documentation
 ```
 
 ---
 
-## 📄 License & Authorship
+## License & Authorship
 
 * **Author:** [Klever López](https://github.com/Klopezxd)
 * **License:** MIT License — Open source for academic, professional, and personal use.

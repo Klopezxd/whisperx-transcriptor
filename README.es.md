@@ -1,40 +1,40 @@
-# 🎙️ WhisperX Transcriptor Pro
+# Pipeline de Transcripción y Diarización con WhisperX
 
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces%20Live%20Demo-blue)](https://huggingface.co/spaces/Klopezxd/transcriptor-whisperx)
 ![Python](https://img.shields.io/badge/Python-3.10-3776AB.svg?logo=python&logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch-2.8-EE4C2C.svg?logo=pytorch&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C.svg?logo=pytorch&logoColor=white)
 ![CUDA](https://img.shields.io/badge/CUDA-12.x-76B900.svg?logo=nvidia&logoColor=white)
+![Linter](https://img.shields.io/badge/Linter-Ruff-000000.svg?logo=ruff&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
-![Code Style](https://img.shields.io/badge/Code%20Style-Clean%20Code-brightgreen.svg)
 
-> **Pipeline de transcripción de audio/video de alta fidelidad, alineación fonética de marcas de tiempo a nivel de palabra y diarización de hablantes (separación de interlocutores).**
+> Pipeline de transcripción de audio y video con alineación fonética a nivel de palabra y diarización de locutores basado en WhisperX y Pyannote Audio.
 
 *Read this document in English: [README.md](README.md)*
 
 ---
 
-## 🌟 Características Principales
+## Características Principales
 
-* 🚀 **Inferencia Ultra-Rápida:** Basado en **WhisperX** (faster-whisper / CTranslate2), hasta 5 veces más rápido que Whisper estándar.
-* 🎯 **Alineación Fonética Precisa:** Integra modelos **Wav2Vec2** para alinear el texto fonéticamente a marcas de tiempo exactas por palabra.
-* 👥 **Diarización de Hablantes:** Identifica y separa automáticamente quién dijo qué mediante **Pyannote Audio 3.1**.
-* ⚡ **Optimización VRAM (4GB Ready):** Diseñado con cuantización `INT8` y recolección agresiva de memoria entre fases, permitiendo ejecución fluida en GPUs de consumo (ej. NVIDIA GTX 1650 con 4GB VRAM) y en **Hugging Face ZeroGPU**.
-* 🖥️ **Doble Interfaz (Web + CLI):**
-  * **Web UI (Gradio):** Interfaz moderna y accesible desde el navegador.
-  * **CLI (Terminal):** Soporte de argumentos completos (`argparse`) con selector gráfico interactivo de respaldo (Tkinter).
-* 🔒 **Seguridad y Clean Code:** Arquitectura desacoplada, tipado estricto (Type Hinting), logging estructurado y gestión segura de secretos vía variables de entorno (`HF_TOKEN` / `.env`).
+* **Inferencia de Alto Rendimiento:** Basado en **WhisperX** (faster-whisper / CTranslate2), hasta $5\times$ más rápido que implementaciones tradicionales de Whisper.
+* **Alineación Fonética Precisa:** Integra modelos **Wav2Vec2** para alinear fonéticamente marcas de tiempo exactas por palabra.
+* **Diarización de Hablantes:** Identifica y segmenta interlocutores automáticamente mediante **Pyannote Audio 3.1**.
+* **Optimización de Memoria (4GB VRAM & ZeroGPU):** Diseñado con cuantización `INT8` y recolección forzada de memoria entre fases, permitiendo ejecución fluida tanto en GPUs de consumo (ej. NVIDIA GTX 1650 con 4GB VRAM) como en **Hugging Face ZeroGPU**.
+* **Doble Interfaz (Web + CLI):**
+  * **Web UI (Gradio):** Interfaz para navegador con controles de parámetros en tiempo real.
+  * **CLI (Terminal):** Soporte completo de argumentos por consola (`argparse`) con selector gráfico interactivo de respaldo.
+* **Ingeniería de Software:** Tipado estricto (Type Hints), logging estructurado, pipeline desacoplado y gestión segura de credenciales vía variables de entorno.
 
 ---
 
-## 🌐 Demo en Vivo
+## Demo en Vivo
 
-Puedes probar la aplicación inmediatamente sin instalar nada en tu máquina:
+Puedes probar el pipeline directamente en la nube sin configuración local:
 
 👉 **[Abrir en Hugging Face Spaces: Klopezxd/transcriptor-whisperx](https://huggingface.co/spaces/Klopezxd/transcriptor-whisperx)**
 
 ---
 
-## 🏗️ Arquitectura del Pipeline
+## Arquitectura del Pipeline
 
 El pipeline procesa el archivo multimedia en 5 etapas secuenciales con liberación forzada de VRAM entre cada una:
 
@@ -52,7 +52,7 @@ flowchart TD
 
 ---
 
-## 📋 Requisitos del Sistema
+## Requisitos del Sistema
 
 * **Sistema Operativo:** Windows 10/11 o Linux (Ubuntu 20.04+).
 * **Python:** 3.10 (recomendado).
@@ -61,7 +61,7 @@ flowchart TD
 
 ---
 
-## 🚀 Instalación Local
+## Instalación Local
 
 ### Opción 1: Con Conda / Miniconda (Recomendado)
 
@@ -98,7 +98,7 @@ pip install -r requirements.txt
 
 ---
 
-## 🔑 Configuración del Token de Hugging Face (Diarización)
+## Configuración del Token de Hugging Face (Diarización)
 
 La identificación de interlocutores requiere el modelo `pyannote/speaker-diarization-3.1`. Para utilizarlo:
 
@@ -118,7 +118,7 @@ La identificación de interlocutores requiere el modelo `pyannote/speaker-diariz
 
 ---
 
-## 💻 Guía de Uso
+## Guía de Uso
 
 ### 1. Interfaz Web (Gradio)
 
@@ -161,7 +161,7 @@ python cli.py -i "conferencia.wav" --timestamps range -o "./transcripciones"
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```text
 whisperx-transcriptor/
@@ -171,7 +171,7 @@ whisperx-transcriptor/
 │       └── lint.yml             # Análisis estático de código con Ruff
 ├── src/
 │   ├── __init__.py
-│   ├── config.py                # Dataclasses inmutables y enums (Clean Code)
+│   ├── config.py                # Dataclasses inmutables y enums
 │   ├── transcriber.py           # Pipeline orquestador WhisperX + Pyannote
 │   └── utils.py                 # Funciones puras de VRAM, formateo y seguridad
 ├── app.py                       # Interfaz Web Gradio (Local + ZeroGPU)
@@ -183,25 +183,13 @@ whisperx-transcriptor/
 ├── .gitignore                   # Exclusión estricta de medios y temporales
 ├── pyproject.toml               # Configuración de empaquetado y linters
 ├── LICENSE                      # Licencia MIT
-├── README.md                    # Documentación en Español
-└── README.en.md                 # Documentación en Inglés
+├── README.md                    # Documentación principal en Inglés
+└── README.es.md                 # Documentación en Español
 ```
 
 ---
 
-## 🔄 Despliegue Continuo (CI/CD)
-
-El repositorio incluye un workflow en [`.github/workflows/sync-to-hf.yml`](.github/workflows/sync-to-hf.yml). Cada vez que hagas `git push` a la rama `main` de GitHub, el código se sincroniza automáticamente con tu Space de Hugging Face.
-
-**Para activarlo:**
-1. En tu repositorio de GitHub, ve a **Settings** > **Secrets and variables** > **Actions**.
-2. Añade un **New repository secret**:
-   * **Nombre:** `HF_TOKEN`
-   * **Valor:** Tu token de Hugging Face con permisos de escritura (*Write*).
-
----
-
-## 📄 Licencia y Autoría
+## Licencia y Autoría
 
 * **Autor:** [Klever López](https://github.com/Klopezxd)
 * **Licencia:** MIT License — libre para uso personal, académico y comercial.

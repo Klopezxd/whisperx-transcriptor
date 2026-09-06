@@ -99,12 +99,12 @@ theme = gr.themes.Soft(
     neutral_hue="slate"
 )
 
-with gr.Blocks(theme=theme, title="WhisperX Transcriptor Pro") as demo:
+with gr.Blocks(theme=theme, title="WhisperX Transcriptor") as demo:
     gr.Markdown(
         """
-        # 🎙️ WhisperX Transcriptor Pro
-        **Transcripción de alta fidelidad, alineación fonética de palabras y diarización de hablantes.**
-        *Desarrollado con WhisperX, PyTorch y Pyannote. Compatible con ZeroGPU.*
+        # WhisperX Speech Transcriptor & Diarization Pipeline
+        Pipeline de transcripción ASR con alineación fonética a nivel de palabra y diarización de locutores.
+        *Desarrollado con WhisperX, Wav2Vec2 y Pyannote Audio. Optimizado para ejecución local y Hugging Face ZeroGPU.*
         """
     )
 

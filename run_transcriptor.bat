@@ -1,5 +1,5 @@
 @echo off
-title WhisperX Transcriptor Pro
+title WhisperX Transcriptor
 chcp 65001 >nul
 color 0B
 

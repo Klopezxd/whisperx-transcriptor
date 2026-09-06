@@ -48,7 +48,7 @@ def select_file_gui() -> str | None:
 def parse_arguments() -> argparse.Namespace:
     """Configura y parsea los argumentos de línea de comandos."""
     parser = argparse.ArgumentParser(
-        description="🎙️ WhisperX Transcriptor Pro - Transcripción precisa con alineación y diarización.",
+        description="WhisperX Transcriptor - Pipeline de transcripción, alineación fonética y diarización de locutores.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
