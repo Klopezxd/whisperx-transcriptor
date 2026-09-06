@@ -133,7 +133,23 @@ theme = gr.themes.Soft(
     font=[gr.themes.GoogleFont("Inter"), "system-ui", "sans-serif"],
 )
 
-with gr.Blocks(theme=theme, css=custom_css, title="WhisperX Transcriptor") as demo:
+# Compatibilidad entre Gradio < 6.0 y Gradio >= 6.0 (theme y css pasaron de Blocks a launch)
+blocks_kwargs = {"title": "WhisperX Transcriptor"}
+launch_kwargs = {}
+
+try:
+    _gradio_major = int(gr.__version__.split(".")[0])
+    if _gradio_major >= 6:
+        launch_kwargs["theme"] = theme
+        launch_kwargs["css"] = custom_css
+    else:
+        blocks_kwargs["theme"] = theme
+        blocks_kwargs["css"] = custom_css
+except Exception:
+    blocks_kwargs["theme"] = theme
+    blocks_kwargs["css"] = custom_css
+
+with gr.Blocks(**blocks_kwargs) as demo:
     gr.HTML(
         """
         <div id="app-header">
@@ -200,7 +216,6 @@ with gr.Blocks(theme=theme, css=custom_css, title="WhisperX Transcriptor") as de
                 label="Resultado de la Transcripción",
                 placeholder="El texto transcrito aparecerá aquí...",
                 lines=16,
-                show_copy_button=True,
             )
             download_file = gr.File(
                 label="Descargar Documento (.txt)",
@@ -231,4 +246,5 @@ with gr.Blocks(theme=theme, css=custom_css, title="WhisperX Transcriptor") as de
     )
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(**launch_kwargs)
+
