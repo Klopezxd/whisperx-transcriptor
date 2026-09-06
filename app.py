@@ -102,9 +102,8 @@ theme = gr.themes.Soft(
 with gr.Blocks(theme=theme, title="WhisperX Transcriptor") as demo:
     gr.Markdown(
         """
-        # WhisperX Speech Transcriptor & Diarization Pipeline
-        Pipeline de transcripción ASR con alineación fonética a nivel de palabra y diarización de locutores.
-        *Desarrollado con WhisperX, Wav2Vec2 y Pyannote Audio. Optimizado para ejecución local y Hugging Face ZeroGPU.*
+        # WhisperX Transcriptor
+        Sube un archivo de audio o video para transcribir y separar interlocutores.
         """
     )
 
