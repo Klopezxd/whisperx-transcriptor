@@ -16,7 +16,9 @@ jobs:
           lfs: true
 
       - name: Push to Hugging Face
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: |
-          git push --force https://Klopezxd:$HF_TOKEN@huggingface.co/spaces/Klopezxd/transcriptor-whisperx main
+        uses: huggingface/hub-sync@v0.3.0
+        with:
+          github_repo_id: ${{ github.repository }}
+          huggingface_repo_id: Klopezxd/transcriptor-whisperx
+          repo_type: space
+          hf_token: ${{ secrets.HF_TOKEN }}
