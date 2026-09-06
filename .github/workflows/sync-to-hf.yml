@@ -15,6 +15,25 @@ jobs:
           fetch-depth: 0
           lfs: true
 
+      - name: Inject Hugging Face Space Metadata
+        run: |
+          cat << 'EOF' > hf_header.txt
+          ---
+          title: WhisperX Transcriptor
+          emoji: 🎙
+          colorFrom: blue
+          colorTo: gray
+          sdk: gradio
+          app_file: app.py
+          pinned: false
+          license: mit
+          ---
+
+          EOF
+          cat hf_header.txt README.md > README_temp.md
+          mv README_temp.md README.md
+          rm hf_header.txt
+
       - name: Push to Hugging Face
         uses: huggingface/hub-sync@v0.3.0
         with:

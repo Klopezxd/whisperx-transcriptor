@@ -1,14 +1,3 @@
----
-title: WhisperX Transcriptor
-emoji: 🎙
-colorFrom: blue
-colorTo: gray
-sdk: gradio
-app_file: app.py
-pinned: false
-license: mit
----
-
 # WhisperX Audio Transcriptor & Diarization Pipeline
 
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces%20Live%20Demo-blue)](https://huggingface.co/spaces/Klopezxd/transcriptor-whisperx)
