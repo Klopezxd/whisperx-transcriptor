@@ -22,11 +22,35 @@ from src.utils import TranscriptionError, clear_gpu_vram, setup_logger
 
 logger = setup_logger("whisperx_app")
 
+def estimate_gpu_duration(
+    media_file,
+    model_name: str = "",
+    enable_diarization: bool = False,
+    *args,
+    **kwargs
+) -> int:
+    """
+    Calcula dinámicamente el tiempo de GPU necesario:
+    - 60s para transcripciones estándar rápidas (optimiza cuota y cola).
+    - 120s si se activa diarización o el archivo supera los 20MB.
+    """
+    try:
+        if enable_diarization:
+            return 120
+        if media_file:
+            path = media_file.name if hasattr(media_file, "name") else str(media_file)
+            if os.path.exists(path) and os.path.getsize(path) > 20 * 1024 * 1024:
+                return 120
+    except Exception:
+        pass
+    return 60
+
+
 # Compatibilidad con ZeroGPU en Hugging Face Spaces
 try:
     import spaces
 
-    GPU_DECORATOR = spaces.GPU
+    GPU_DECORATOR = spaces.GPU(duration=estimate_gpu_duration)
 except (ImportError, TypeError, AttributeError):
     def GPU_DECORATOR(func):
         return func
