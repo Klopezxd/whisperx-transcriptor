@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "whisperx-transcriptor"
+version = "2.0.0"
+description = "Pipeline modular de transcripción, alineación fonética y diarización de audio con WhisperX."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Klever López", email = "lkleverjosue@gmail.com" }
+]
+license = { text = "MIT" }
+keywords = ["whisper", "whisperx", "transcription", "diarization", "speech-to-text", "pytorch", "cuda"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E501"]

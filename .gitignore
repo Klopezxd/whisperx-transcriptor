@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+
+# Environments
+venv/
+.venv/
+env/
+
+# Credenciales y Secretos
+.env
+.env.local
+*.key
+*.token
+
+# Multimedia (Archivos pesados)
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+*.wav
+*.mp3
+*.m4a
+*.flac
+*.ogg
+
+# Salidas de transcripción
+*_TRANSCRIPCION.txt
+*_TRANSCRITO.txt
+
+# Caches de modelos
+.cache/
+hf_cache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,7 @@
+whisperx
+gradio>=4.0.0
+torch
+torchvision
+torchaudio
+pyannote.audio
+python-dotenv
