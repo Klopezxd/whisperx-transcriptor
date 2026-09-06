@@ -40,14 +40,14 @@ The transcription workflow executes across 5 isolated stages, clearing GPU VRAM 
 
 ```mermaid
 flowchart TD
-    A[Input Media File MP4 / WAV / MP3] --> B[Audio Extraction & Preprocessing]
-    B --> C[1. ASR Transcription: WhisperX Engine]
-    C -->|VRAM Flush| D[2. Phoneme Alignment: Wav2Vec2]
-    D -->|VRAM Flush| E{Diarization Requested?}
-    E -->|Yes| F[3. Speaker Segmentation: Pyannote Audio]
-    E -->|No| G[4. Segment Formatter]
+    A["Input Media File<br>(MP4 / WAV / MP3)"] --> B["Audio Extraction<br>& Preprocessing"]
+    B --> C["1. ASR Transcription<br>(WhisperX Engine)"]
+    C -->|VRAM Flush| D["2. Phoneme Alignment<br>(Wav2Vec2)"]
+    D -->|VRAM Flush| E{"Diarization<br>Requested?"}
+    E -->|Yes| F["3. Speaker Segmentation<br>(Pyannote Audio)"]
+    E -->|No| G["4. Segment Formatter"]
     F -->|VRAM Flush| G
-    G --> H[Final .txt Document + UI Preview]
+    G --> H["Output Transcript (.txt)<br>& UI Preview"]
 ```
 
 ---

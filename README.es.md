@@ -40,14 +40,14 @@ El pipeline procesa el archivo multimedia en 5 etapas secuenciales con liberaci�
 
 ```mermaid
 flowchart TD
-    A[Archivo Multimedia MP4 / WAV / MP3] --> B[Extracción y Carga de Audio]
-    B --> C[1. ASR Transcripción: WhisperX]
-    C -->|Libera VRAM| D[2. Alineación Fonética: Wav2Vec2]
-    D -->|Libera VRAM| E{¿Diarización Activa?}
-    E -->|Sí| F[3. Identificación de Hablantes: Pyannote]
-    E -->|No| G[4. Formateador de Segmentos]
+    A["Archivo Multimedia<br>(MP4 / WAV / MP3)"] --> B["Extracción y Carga<br>de Audio"]
+    B --> C["1. Transcripción ASR<br>(WhisperX)"]
+    C -->|Libera VRAM| D["2. Alineación Fonética<br>(Wav2Vec2)"]
+    D -->|Libera VRAM| E{"¿Diarización<br>Activa?"}
+    E -->|Sí| F["3. Segmentación de Hablantes<br>(Pyannote Audio)"]
+    E -->|No| G["4. Formateador de Segmentos"]
     F -->|Libera VRAM| G
-    G --> H[Archivo Final .txt + Vista Previa]
+    G --> H["Documento Final (.txt)<br>+ Vista Previa"]
 ```
 
 ---
