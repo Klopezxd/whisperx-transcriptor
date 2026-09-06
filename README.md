@@ -7,201 +7,174 @@
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Code Style](https://img.shields.io/badge/Code%20Style-Clean%20Code-brightgreen.svg)
 
-> **Pipeline de transcripción de audio/video de alta fidelidad, alineación fonética de marcas de tiempo a nivel de palabra y diarización de hablantes (separación de interlocutores).**
+> **High-fidelity multimedia transcription pipeline featuring word-level phoneme alignment and multi-speaker diarization using WhisperX and Pyannote Audio.**
 
-*Read this document in English: [README.en.md](README.en.md)*
-
----
-
-## 🌟 Características Principales
-
-* 🚀 **Inferencia Ultra-Rápida:** Basado en **WhisperX** (faster-whisper / CTranslate2), hasta 5 veces más rápido que Whisper estándar.
-* 🎯 **Alineación Fonética Precisa:** Integra modelos **Wav2Vec2** para alinear el texto fonéticamente a marcas de tiempo exactas por palabra.
-* 👥 **Diarización de Hablantes:** Identifica y separa automáticamente quién dijo qué mediante **Pyannote Audio 3.1**.
-* ⚡ **Optimización VRAM (4GB Ready):** Diseñado con cuantización `INT8` y recolección agresiva de memoria entre fases, permitiendo ejecución fluida en GPUs de consumo (ej. NVIDIA GTX 1650 con 4GB VRAM) y en **Hugging Face ZeroGPU**.
-* 🖥️ **Doble Interfaz (Web + CLI):**
-  * **Web UI (Gradio):** Interfaz moderna y accesible desde el navegador.
-  * **CLI (Terminal):** Soporte de argumentos completos (`argparse`) con selector gráfico interactivo de respaldo (Tkinter).
-* 🔒 **Seguridad y Clean Code:** Arquitectura desacoplada, tipado estricto (Type Hinting), logging estructurado y gestión segura de secretos vía variables de entorno (`HF_TOKEN` / `.env`).
+*Leer este documento en Español: [README.es.md](README.es.md)*
 
 ---
 
-## 🌐 Demo en Vivo
+## 🌟 Key Capabilities
 
-Puedes probar la aplicación inmediatamente sin instalar nada en tu máquina:
-
-👉 **[Abrir en Hugging Face Spaces: Klopezxd/transcriptor-whisperx](https://huggingface.co/spaces/Klopezxd/transcriptor-whisperx)**
+* 🚀 **High-Throughput ASR:** Powered by **WhisperX** (faster-whisper / CTranslate2), delivering up to $5\times$ speedups over vanilla Whisper implementations.
+* 🎯 **Word-Level Phoneme Alignment:** Incorporates **Wav2Vec2** acoustic models to achieve exact word-boundary timestamp alignment.
+* 👥 **Speaker Diarization:** Identifies and segments discrete speakers seamlessly using **Pyannote Audio 3.1**.
+* ⚡ **Consumer GPU & ZeroGPU Ready:** Architected with `INT8` quantization and aggressive VRAM garbage collection between pipeline stages, running comfortably on 4GB VRAM cards (e.g., NVIDIA GeForce GTX 1650) as well as **Hugging Face ZeroGPU** runners.
+* 🖥️ **Dual Interface (Web + CLI):**
+  * **Web UI (Gradio):** Interactive web application.
+  * **CLI (Terminal):** Fully featured command-line interface with interactive graphical file picker fallback.
+* 🔒 **Software Engineering Rigor:** Built following Clean Code principles, explicit type hints, structured logging, decoupled domain logic, and secure environment-based credential handling.
 
 ---
 
-## 🏗️ Arquitectura del Pipeline
+## 🌐 Live Interactive Demo
 
-El pipeline procesa el archivo multimedia en 5 etapas secuenciales con liberación forzada de VRAM entre cada una:
+Test the model in the cloud without local configuration:
+
+👉 **[Launch on Hugging Face Spaces: Klopezxd/transcriptor-whisperx](https://huggingface.co/spaces/Klopezxd/transcriptor-whisperx)**
+
+---
+
+## 🏗️ Pipeline Architecture
+
+The transcription workflow executes across 5 isolated stages, clearing GPU VRAM at each boundary to prevent Out-Of-Memory (OOM) faults:
 
 ```mermaid
 flowchart TD
-    A[Archivo Multimedia MP4 / WAV / MP3] --> B[Extracción y Carga de Audio]
-    B --> C[1. ASR Transcripción: WhisperX]
-    C -->|Libera VRAM| D[2. Alineación Fonética: Wav2Vec2]
-    D -->|Libera VRAM| E{¿Diarización Activa?}
-    E -->|Sí| F[3. Identificación de Hablantes: Pyannote]
-    E -->|No| G[4. Formateador de Segmentos]
-    F -->|Libera VRAM| G
-    G --> H[Archivo Final .txt + Vista Previa]
+    A[Input Media File MP4 / WAV / MP3] --> B[Audio Extraction & Preprocessing]
+    B --> C[1. ASR Transcription: WhisperX Engine]
+    C -->|VRAM Flush| D[2. Phoneme Alignment: Wav2Vec2]
+    D -->|VRAM Flush| E{Diarization Requested?}
+    E -->|Yes| F[3. Speaker Segmentation: Pyannote Audio]
+    E -->|No| G[4. Segment Formatter]
+    F -->|VRAM Flush| G
+    G --> H[Final .txt Document + UI Preview]
 ```
 
 ---
 
-## 📋 Requisitos del Sistema
+## 📋 System Requirements
 
-* **Sistema Operativo:** Windows 10/11 o Linux (Ubuntu 20.04+).
-* **Python:** 3.10 (recomendado).
-* **FFmpeg:** Instalado en el sistema y disponible en el `PATH`.
-* **Hardware GPU (Opcional pero recomendado):** NVIDIA GeForce GTX 1650 o superior con drivers actualizados y soporte CUDA 12.x. (También funciona en CPU).
+* **OS:** Windows 10/11 or Linux (Ubuntu 20.04+).
+* **Python:** 3.10 (recommended).
+* **FFmpeg:** Installed and exported to system `PATH`.
+* **Hardware GPU (Optional):** NVIDIA GeForce GTX 1650 or greater with CUDA 12.x support (CPU fallback fully supported).
 
 ---
 
-## 🚀 Instalación Local
+## 🚀 Local Installation
 
-### Opción 1: Con Conda / Miniconda (Recomendado)
+### Conda Environment (Recommended)
 
 ```bash
-# 1. Clonar el repositorio
+# Clone the repository
 git clone https://github.com/Klopezxd/whisperx-transcriptor.git
 cd whisperx-transcriptor
 
-# 2. Crear el entorno aislado con Python 3.10
+# Create and activate isolated Python 3.10 environment
 conda create -n transcriptor python=3.10 -y
 conda activate transcriptor
 
-# 3. Instalar PyTorch con aceleración CUDA 12.x
+# Install PyTorch with CUDA 12.x wheel
 pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0 --index-url https://download.pytorch.org/whl/cu126
 
-# 4. Instalar WhisperX y dependencias del proyecto
+# Install dependencies
 pip install -r requirements.txt
 
-# 5. Verificar aceleración GPU
-python -c "import torch; print('CUDA disponible:', torch.cuda.is_available())"
-```
-
-### Opción 2: Con entorno virtual venv estándar
-
-```bash
-python -m venv venv
-# En Windows:
-.\venv\Scripts\activate
-# En Linux:
-source venv/bin/activate
-
-pip install -r requirements.txt
+# Verify CUDA acceleration
+python -c "import torch; print('CUDA Ready:', torch.cuda.is_available())"
 ```
 
 ---
 
-## 🔑 Configuración del Token de Hugging Face (Diarización)
+## 🔑 Hugging Face Authentication (For Diarization)
 
-La identificación de interlocutores requiere el modelo `pyannote/speaker-diarization-3.1`. Para utilizarlo:
+Speaker diarization leverages gated models from Pyannote. To enable it:
 
-1. Crea una cuenta gratuita en [Hugging Face](https://huggingface.co/).
-2. Acepta los términos de uso en:
+1. Create a free account at [Hugging Face](https://huggingface.co/).
+2. Accept model usage terms:
    * [pyannote/speaker-diarization-3.1](https://huggingface.co/pyannote/speaker-diarization-3.1)
    * [pyannote/segmentation-3.0](https://huggingface.co/pyannote/segmentation-3.0)
-3. Genera un Token de lectura en [Hugging Face Settings](https://huggingface.co/settings/tokens).
-4. Configúralo en tu entorno:
+3. Generate a read-access token under [Hugging Face Settings](https://huggingface.co/settings/tokens).
+4. Export the token:
    ```bash
-   # Copiar la plantilla de ejemplo
    cp .env.example .env
-   # Editar .env y colocar:
-   HF_TOKEN=hf_tu_token_aqui
+   # Add your token to .env:
+   HF_TOKEN=hf_your_token_here
    ```
-   *También puedes pasarlo como argumento `--token` en la CLI o introducirlo en el campo correspondiente en la Web UI.*
 
 ---
 
-## 💻 Guía de Uso
+## 💻 Usage Guide
 
-### 1. Interfaz Web (Gradio)
-
-Lanza el servidor local con:
+### 1. Web Application
 
 ```bash
 python app.py
 ```
-Abre tu navegador en `http://127.0.0.1:7860` para usar la interfaz visual.
+Navigate to `http://127.0.0.1:7860` in any modern web browser.
 
 ---
 
-### 2. Interfaz de Línea de Comandos (CLI)
+### 2. Command Line Interface (CLI)
 
 ```bash
-# Modo interactivo (abre ventana gráfica para elegir el archivo si no pasas -i):
+# Interactive mode (opens file selection dialog if no -i argument is provided):
 python cli.py
 
-# Transcripción directa con modelo turbo:
-python cli.py -i "video_clase.mp4" -m large-v3-turbo
+# Direct processing with turbo model:
+python cli.py -i "lecture.mp4" -m large-v3-turbo
 
-# Transcripción con Diarización (identificación de personas):
-python cli.py -i "reunion.mp4" -d
+# Enable multi-speaker diarization:
+python cli.py -i "interview.mp4" -d
 
-# Guardar en carpeta específica con formato de marcas de tiempo en rango:
-python cli.py -i "conferencia.wav" --timestamps range -o "./transcripciones"
+# Custom output directory with range timestamps:
+python cli.py -i "meeting.wav" --timestamps range -o "./transcripts"
 ```
 
-#### Opciones CLI disponibles:
+#### Available CLI Arguments:
 
-| Flag | Tipo | Descripción | Por defecto |
+| Flag | Type | Description | Default |
 |---|---|---|---|
-| `-i`, `--input` | String | Ruta al archivo multimedia. Si se omite, abre selector gráfico. | `None` |
+| `-i`, `--input` | String | Path to media file (launches GUI picker if omitted). | `None` |
 | `-m`, `--model` | Choice | `large-v3-turbo`, `large-v3`, `medium`, `small`, `base` | `large-v3-turbo` |
-| `-d`, `--diarize` | Flag | Activa la identificación de hablantes (requiere token). | `False` |
-| `--timestamps` | Choice | Formato de tiempo: `simple`, `range`, `none` | `simple` |
-| `-t`, `--token` | String | Token explícito de Hugging Face. | Variable `HF_TOKEN` |
-| `--compute-type` | Choice | Cuantización: `int8` (recomendado 4GB), `float16`, `float32` | `int8` |
-| `-o`, `--output-dir` | String | Directorio destino para el `.txt`. | Mismo del archivo |
+| `-d`, `--diarize` | Flag | Enables speaker diarization (requires token). | `False` |
+| `--timestamps` | Choice | Timestamp formatting: `simple`, `range`, `none` | `simple` |
+| `-t`, `--token` | String | Hugging Face token override. | `HF_TOKEN` env |
+| `--compute-type` | Choice | Quantization: `int8` (recommended for 4GB), `float16`, `float32` | `int8` |
+| `-o`, `--output-dir` | String | Output folder for `.txt` transcripts. | Source directory |
 
 ---
 
-## 📁 Estructura del Proyecto
+## 📁 Repository Structure
 
 ```text
 whisperx-transcriptor/
 ├── .github/
 │   └── workflows/
-│       ├── sync-to-hf.yml       # CI/CD: Sincronización automática con Hugging Face Spaces
-│       └── lint.yml             # Análisis estático de código con Ruff
+│       ├── sync-to-hf.yml       # Continuous Deployment to Hugging Face Spaces
+│       └── lint.yml             # Code quality and linting via Ruff
 ├── src/
 │   ├── __init__.py
-│   ├── config.py                # Dataclasses inmutables y enums (Clean Code)
-│   ├── transcriber.py           # Pipeline orquestador WhisperX + Pyannote
-│   └── utils.py                 # Funciones puras de VRAM, formateo y seguridad
-├── app.py                       # Interfaz Web Gradio (Local + ZeroGPU)
-├── cli.py                       # Interfaz CLI avanzada
-├── requirements.txt             # Dependencias Python
-├── packages.txt                 # Dependencias del SO (FFmpeg en HF Spaces)
-├── environment.yml              # Definición de entorno Conda
-├── .env.example                 # Plantilla de credenciales
-├── .gitignore                   # Exclusión estricta de medios y temporales
-├── pyproject.toml               # Configuración de empaquetado y linters
-├── LICENSE                      # Licencia MIT
-├── README.md                    # Documentación en Español
-└── README.en.md                 # Documentación en Inglés
+│   ├── config.py                # Strongly typed dataclasses & enums
+│   ├── transcriber.py           # Core decoupled WhisperX orchestration pipeline
+│   └── utils.py                 # Pure helper functions, memory management, and security
+├── app.py                       # Gradio Web UI entrypoint (Local + ZeroGPU)
+├── cli.py                       # Advanced CLI entrypoint
+├── requirements.txt             # Python dependencies
+├── packages.txt                 # OS packages (FFmpeg for Hugging Face Spaces)
+├── environment.yml              # Conda environment definition
+├── .env.example                 # Credential template
+├── .gitignore                   # Strict exclusions for artifacts and large media
+├── pyproject.toml               # Modern packaging metadata & Ruff configuration
+├── LICENSE                      # MIT License
+├── README.md                    # Documentation in Spanish
+└── README.en.md                 # Documentation in English
 ```
 
 ---
 
-## 🔄 Despliegue Continuo (CI/CD)
+## 📄 License & Authorship
 
-El repositorio incluye un workflow en [`.github/workflows/sync-to-hf.yml`](.github/workflows/sync-to-hf.yml). Cada vez que hagas `git push` a la rama `main` de GitHub, el código se sincroniza automáticamente con tu Space de Hugging Face.
+* **Author:** [Klever López](https://github.com/Klopezxd)
+* **License:** MIT License — Open source for academic, professional, and personal use.
 
-**Para activarlo:**
-1. En tu repositorio de GitHub, ve a **Settings** > **Secrets and variables** > **Actions**.
-2. Añade un **New repository secret**:
-   * **Nombre:** `HF_TOKEN`
-   * **Valor:** Tu token de Hugging Face con permisos de escritura (*Write*).
-
----
-
-## 📄 Licencia y Autoría
-
-* **Autor:** [Klever López](https://github.com/Klopezxd)
-* **Licencia:** MIT License — libre para uso personal, académico y comercial.
