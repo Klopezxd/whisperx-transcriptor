@@ -1,7 +1,21 @@
-whisperx
-gradio>=4.0.0
+---
+title: WhisperX Transcriptor Pro
+emoji: 🎙️
+colorFrom: blue
+colorTo: indigo
+sdk: gradio
+app_file: app.py
+pinned: false
+license: mit
+---
+
+' + (Get-Content "c:\Users\lklev\Desktop\whisperx-transcriptor\README.md" -Raw -Encoding UTF8) | Set-Content "c:\Users\lklev\Desktop\whisperx-transcriptor\README.md" -Encoding UTF8
+
+@'
 torch
-torchvision
 torchaudio
+git+https://github.com/m-bain/whisperX.git
+gradio>=4.0.0
+spaces
 pyannote.audio
 python-dotenv
