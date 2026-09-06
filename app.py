@@ -93,25 +93,26 @@ def process_transcription(
         return f"❌ Ocurrió un error inesperado durante el procesamiento: {e}", None
 
 
-# Estilos CSS y Tema visual refinado
+# Estilos CSS y Tema visual refinado (adaptable a escritorio y móvil)
 custom_css = """
 .gradio-container {
-    max-width: 1100px !important;
+    max-width: 1400px !important;
+    width: 96% !important;
     margin: 0 auto !important;
 }
 #app-header {
     text-align: center;
-    padding: 1.5rem 0 1rem 0;
+    padding: 1.25rem 0 0.75rem 0;
 }
 #app-header h1 {
-    font-size: 2.2rem;
+    font-size: 2.1rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.25rem;
 }
 #app-header p {
     color: #64748b;
-    font-size: 1.05rem;
+    font-size: 1rem;
 }
 .btn-primary {
     background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%) !important;
@@ -120,9 +121,23 @@ custom_css = """
 }
 #footer-note {
     text-align: center;
-    margin-top: 2rem;
-    font-size: 0.88rem;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
     color: #94a3b8;
+}
+
+/* Responsividad para móviles y pantallas compactas */
+@media (max-width: 768px) {
+    .gradio-container {
+        width: 100% !important;
+        padding: 0.5rem !important;
+    }
+    #app-header h1 {
+        font-size: 1.55rem;
+    }
+    #app-header p {
+        font-size: 0.9rem;
+    }
 }
 """
 
@@ -161,7 +176,7 @@ with gr.Blocks(**blocks_kwargs) as demo:
 
     with gr.Row(equal_height=False):
         # Columna Izquierda: Entrada y Controles
-        with gr.Column(scale=5):
+        with gr.Column(scale=1):
             input_media = gr.File(
                 label="Archivo Multimedia",
                 file_types=["audio", "video"],
@@ -211,11 +226,11 @@ with gr.Blocks(**blocks_kwargs) as demo:
                 )
 
         # Columna Derecha: Salida y Descarga
-        with gr.Column(scale=6):
+        with gr.Column(scale=1):
             output_text = gr.Textbox(
                 label="Resultado de la Transcripción",
                 placeholder="El texto transcrito aparecerá aquí...",
-                lines=16,
+                lines=12,
             )
             download_file = gr.File(
                 label="Descargar Documento (.txt)",
