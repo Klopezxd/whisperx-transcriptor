@@ -22,11 +22,12 @@ from src.utils import TranscriptionError, clear_gpu_vram, setup_logger
 
 logger = setup_logger("whisperx_app")
 
-# Compatibilidad con ZeroGPU en Hugging Face Spaces
+# Compatibilidad con ZeroGPU en Hugging Face Spaces (hasta 120s de GPU dedicada)
 try:
     import spaces
-    GPU_DECORATOR = spaces.GPU
-except ImportError:
+
+    GPU_DECORATOR = spaces.GPU(duration=120)
+except (ImportError, TypeError, AttributeError):
     def GPU_DECORATOR(func):
         return func
 
@@ -37,30 +38,30 @@ def process_transcription(
     model_name: str,
     enable_diarization: bool,
     timestamp_option: str,
-    custom_token: str,
-    progress=gr.Progress()
+    progress=gr.Progress(),
 ) -> tuple[str, str | None]:
     """Procesa el archivo multimedia y retorna el texto y la ruta del archivo generado."""
     if not media_file:
-        return "❌ Por favor selecciona un archivo de audio o video.", None
+        return "⚠️ Por favor selecciona o arrastra un archivo de audio o video.", None
 
     media_path = media_file.name if hasattr(media_file, "name") else str(media_file)
 
-    # Mapeo de formato de timestamps
+    # Mapeo de formato de marcas de tiempo
     mode_map = {
         "Simple ([HH:MM:SS])": TimestampMode.SIMPLE,
         "Rango ([Inicio - Fin])": TimestampMode.RANGE,
-        "Ninguno (Texto limpio)": TimestampMode.NONE
+        "Texto continuo (Sin marcas)": TimestampMode.NONE,
     }
     selected_mode = mode_map.get(timestamp_option, TimestampMode.SIMPLE)
 
-    token_to_use = custom_token.strip() if custom_token and custom_token.strip() else os.getenv("HF_TOKEN")
+    token_to_use = os.getenv("HF_TOKEN")
 
     if enable_diarization and not token_to_use:
         return (
-            "❌ Para activar la identificación de hablantes (diarización), "
-            "debes proporcionar un Token de Hugging Face o configurarlo en los Secrets del Space.",
-            None
+            "⚠️ La identificación de hablantes (diarización) requiere configurar 'HF_TOKEN' "
+            "en las variables de entorno o Secrets del servidor.\n\n"
+            "Consejo: Desmarca la casilla de diarización para transcribir directamente con Whisper.",
+            None,
         )
 
     def on_progress(p: float, msg: str) -> None:
@@ -70,14 +71,14 @@ def process_transcription(
         config = TranscriptionConfig.create_default(
             model_name=model_name,
             enable_diarization=enable_diarization,
-            hf_token=token_to_use
+            hf_token=token_to_use,
         )
         object.__setattr__(config, "timestamp_mode", selected_mode)
 
         pipeline = WhisperXPipeline(config)
         result = pipeline.process(
             media_path=media_path,
-            progress_callback=on_progress
+            progress_callback=on_progress,
         )
 
         return result.formatted_text, str(result.output_path)
@@ -85,80 +86,129 @@ def process_transcription(
     except TranscriptionError as e:
         clear_gpu_vram()
         logger.error("Error en procesamiento web: %s", e)
-        return f"❌ Error: {str(e)}", None
+        return f"❌ Error de transcripción: {e}", None
     except Exception as e:
         clear_gpu_vram()
         logger.exception("Error inesperado en app web")
-        return f"❌ Ocurrió un fallo inesperado: {str(e)}", None
+        return f"❌ Ocurrió un error inesperado durante el procesamiento: {e}", None
 
 
-# Construcción de la Interfaz Gráfica Gradio
+# Estilos CSS y Tema visual refinado
+custom_css = """
+.gradio-container {
+    max-width: 1100px !important;
+    margin: 0 auto !important;
+}
+#app-header {
+    text-align: center;
+    padding: 1.5rem 0 1rem 0;
+}
+#app-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.3rem;
+}
+#app-header p {
+    color: #64748b;
+    font-size: 1.05rem;
+}
+.btn-primary {
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%) !important;
+    border: none !important;
+    font-weight: 600 !important;
+}
+#footer-note {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.88rem;
+    color: #94a3b8;
+}
+"""
+
 theme = gr.themes.Soft(
     primary_hue="indigo",
     secondary_hue="blue",
-    neutral_hue="slate"
+    neutral_hue="slate",
+    font=[gr.themes.GoogleFont("Inter"), "system-ui", "sans-serif"],
 )
 
-with gr.Blocks(theme=theme, title="WhisperX Transcriptor") as demo:
-    gr.Markdown(
+with gr.Blocks(theme=theme, css=custom_css, title="WhisperX Transcriptor") as demo:
+    gr.HTML(
         """
-        # WhisperX Transcriptor
-        Sube un archivo de audio o video para transcribir y separar interlocutores.
+        <div id="app-header">
+            <h1>🎙️ WhisperX Transcriptor</h1>
+            <p>Transcripción rápida de audio y video con alineación fonética y separación de interlocutores</p>
+        </div>
         """
     )
 
-    with gr.Row():
-        with gr.Column(scale=1):
+    with gr.Row(equal_height=False):
+        # Columna Izquierda: Entrada y Controles
+        with gr.Column(scale=5):
             input_media = gr.File(
-                label="📁 Archivo Multimedia (MP4, MP3, WAV, MKV, M4A)",
-                file_types=["video", "audio"]
+                label="Archivo Multimedia",
+                file_types=["audio", "video"],
+                file_count="single",
             )
 
-            with gr.Accordion("⚙️ Opciones de Configuración", open=True):
+            diarization_checkbox = gr.Checkbox(
+                value=False,
+                label="Identificar quién habla (Diarización)",
+                info="Separa y etiqueta las intervenciones de cada locutor automáticamente.",
+            )
+
+            with gr.Accordion("Opciones avanzadas", open=False):
                 model_selector = gr.Dropdown(
                     choices=[
                         ModelName.LARGE_V3_TURBO.value,
                         ModelName.LARGE_V3.value,
                         ModelName.MEDIUM.value,
                         ModelName.SMALL.value,
-                        ModelName.BASE.value
+                        ModelName.BASE.value,
                     ],
                     value=ModelName.LARGE_V3_TURBO.value,
-                    label="🤖 Modelo Whisper",
-                    info="'large-v3-turbo' ofrece el mejor equilibrio entre velocidad y máxima precisión."
+                    label="Modelo de Whisper",
+                    info="'large-v3-turbo' ofrece máxima precisión con la velocidad más alta.",
                 )
 
                 timestamp_selector = gr.Radio(
                     choices=[
                         "Simple ([HH:MM:SS])",
                         "Rango ([Inicio - Fin])",
-                        "Ninguno (Texto limpio)"
+                        "Texto continuo (Sin marcas)",
                     ],
                     value="Simple ([HH:MM:SS])",
-                    label="⏰ Formato de Marcas de Tiempo"
+                    label="Marcas de tiempo",
                 )
 
-                diarization_checkbox = gr.Checkbox(
-                    value=False,
-                    label="👥 Identificar Hablantes (Diarización)",
-                    info="Activa la separación de personas usando Pyannote Audio (requiere Token de Hugging Face)."
+            with gr.Row():
+                btn_clear = gr.ClearButton(
+                    value="Limpiar",
+                    variant="secondary",
+                )
+                btn_transcribe = gr.Button(
+                    "Iniciar Transcripción",
+                    variant="primary",
+                    size="lg",
+                    elem_classes=["btn-primary"],
                 )
 
-                token_input = gr.Textbox(
-                    label="🔑 Hugging Face Token (Opcional si está en variables de entorno)",
-                    placeholder="hf_...",
-                    type="password"
-                )
-
-            btn_transcribe = gr.Button("🚀 Iniciar Transcripción", variant="primary", size="lg")
-
-        with gr.Column(scale=1):
+        # Columna Derecha: Salida y Descarga
+        with gr.Column(scale=6):
             output_text = gr.Textbox(
-                label="📄 Vista Previa de la Transcripción",
+                label="Resultado de la Transcripción",
                 placeholder="El texto transcrito aparecerá aquí...",
-                lines=18
+                lines=16,
+                show_copy_button=True,
             )
-            download_file = gr.File(label="💾 Descargar Archivo (.txt)")
+            download_file = gr.File(
+                label="Descargar Documento (.txt)",
+                interactive=False,
+            )
+
+    # Conexión de eventos
+    btn_clear.add([input_media, output_text, download_file])
 
     btn_transcribe.click(
         fn=process_transcription,
@@ -167,16 +217,16 @@ with gr.Blocks(theme=theme, title="WhisperX Transcriptor") as demo:
             model_selector,
             diarization_checkbox,
             timestamp_selector,
-            token_input
         ],
-        outputs=[output_text, download_file]
+        outputs=[output_text, download_file],
     )
 
-    gr.Markdown(
+    gr.HTML(
         """
-        ---
-        💡 **Acerca de este proyecto:** Desarrollado por [Klever López](https://github.com/Klopezxd) | 
-        Código fuente disponible en [GitHub](https://github.com/Klopezxd/whisperx-transcriptor)
+        <div id="footer-note">
+            Desarrollado con <strong>WhisperX</strong>, <strong>Wav2Vec2</strong> y <strong>Pyannote Audio</strong> · Acelerado con <strong>ZeroGPU</strong><br>
+            <a href="https://github.com/Klopezxd/whisperx-transcriptor" target="_blank" style="color: inherit; text-decoration: underline;">Código fuente en GitHub</a>
+        </div>
         """
     )
 
