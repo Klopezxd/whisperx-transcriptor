@@ -22,11 +22,11 @@ from src.utils import TranscriptionError, clear_gpu_vram, setup_logger
 
 logger = setup_logger("whisperx_app")
 
-# Compatibilidad con ZeroGPU en Hugging Face Spaces (hasta 120s de GPU dedicada)
+# Compatibilidad con ZeroGPU en Hugging Face Spaces
 try:
     import spaces
 
-    GPU_DECORATOR = spaces.GPU(duration=120)
+    GPU_DECORATOR = spaces.GPU
 except (ImportError, TypeError, AttributeError):
     def GPU_DECORATOR(func):
         return func
