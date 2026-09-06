@@ -5,8 +5,6 @@ Aplica principios de Clean Code con inmutabilidad y validación de tipos.
 
 from dataclasses import dataclass
 from enum import Enum
-from pathlib import Path
-from typing import Optional
 
 
 class ModelName(str, Enum):
@@ -53,17 +51,17 @@ class TranscriptionConfig:
     batch_size: int = 16
     enable_diarization: bool = False
     timestamp_mode: TimestampMode = TimestampMode.SIMPLE
-    hf_token: Optional[str] = None
-    language: Optional[str] = None
+    hf_token: str | None = None
+    language: str | None = None
 
     @classmethod
     def create_default(
         cls,
         model_name: str = ModelName.LARGE_V3_TURBO.value,
         enable_diarization: bool = False,
-        hf_token: Optional[str] = None,
-        device: Optional[str] = None,
-        compute_type: Optional[str] = None
+        hf_token: str | None = None,
+        device: str | None = None,
+        compute_type: str | None = None
     ) -> "TranscriptionConfig":
         """Crea una configuración con selección automática de hardware."""
         import torch

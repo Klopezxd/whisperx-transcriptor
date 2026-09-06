@@ -8,10 +8,8 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Optional
 
 from src.config import TimestampMode
-
 
 # --- Excepciones de Dominio ---
 
@@ -62,7 +60,7 @@ def clear_gpu_vram() -> None:
 
 # --- Formateo de Tiempos y Salidas ---
 
-def format_timestamp(seconds: Optional[float]) -> str:
+def format_timestamp(seconds: float | None) -> str:
     """
     Convierte una marca de tiempo en segundos a formato HH:MM:SS.
 
@@ -85,7 +83,7 @@ def format_segment(
     text: str,
     start: float,
     end: float,
-    speaker: Optional[str] = None,
+    speaker: str | None = None,
     mode: TimestampMode = TimestampMode.SIMPLE
 ) -> str:
     """
@@ -119,7 +117,7 @@ def format_segment(
 
 # --- Manejo Seguro de Secretos ---
 
-def resolve_hf_token(explicit_token: Optional[str] = None) -> Optional[str]:
+def resolve_hf_token(explicit_token: str | None = None) -> str | None:
     """
     Resuelve el token de Hugging Face de forma segura sin exponer credenciales.
     Prioridad: argumento explícito > variable de entorno HF_TOKEN > archivo .env.
@@ -135,7 +133,7 @@ def resolve_hf_token(explicit_token: Optional[str] = None) -> Optional[str]:
     env_file = Path(".env")
     if env_file.exists():
         try:
-            with open(env_file, "r", encoding="utf-8") as f:
+            with open(env_file, encoding="utf-8") as f:
                 for line in f:
                     line = line.strip()
                     if line.startswith("HF_TOKEN=") and not line.startswith("#"):

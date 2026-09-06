@@ -7,7 +7,6 @@ Permite procesamiento por lotes o interactivo con selección gráfica de respald
 import argparse
 import sys
 from pathlib import Path
-from typing import Optional
 
 # Configuración de codificación UTF-8 para consolas Windows
 if sys.platform == "win32":
@@ -19,12 +18,12 @@ if sys.platform == "win32":
 
 from src.config import ComputeType, ModelName, TimestampMode, TranscriptionConfig
 from src.transcriber import WhisperXPipeline
-from src.utils import TranscriptionError, resolve_hf_token, setup_logger
+from src.utils import TranscriptionError, setup_logger
 
 logger = setup_logger("whisperx_cli")
 
 
-def select_file_gui() -> Optional[str]:
+def select_file_gui() -> str | None:
     """Abre un diálogo de Tkinter para seleccionar el archivo multimedia."""
     try:
         from tkinter import Tk, filedialog
@@ -163,7 +162,7 @@ def main() -> None:
             output_dir=args.output_dir
         )
         print("\n" + "=" * 55)
-        print(f"🎉 Transcripción completada con éxito!")
+        print("🎉 Transcripción completada con éxito!")
         print(f"💾 Guardado en: {result.output_path}")
         print("=" * 55 + "\n")
     except TranscriptionError as err:

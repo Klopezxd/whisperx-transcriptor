@@ -6,8 +6,6 @@ Diseñada para despliegue en Hugging Face Spaces (ZeroGPU) y ejecución local.
 
 import os
 import sys
-from pathlib import Path
-from typing import Optional, Tuple
 
 if sys.platform == "win32":
     try:
@@ -41,7 +39,7 @@ def process_transcription(
     timestamp_option: str,
     custom_token: str,
     progress=gr.Progress()
-) -> Tuple[str, Optional[str]]:
+) -> tuple[str, str | None]:
     """Procesa el archivo multimedia y retorna el texto y la ruta del archivo generado."""
     if not media_file:
         return "❌ Por favor selecciona un archivo de audio o video.", None

@@ -3,9 +3,10 @@ Orquestador del pipeline WhisperX.
 Aplica principios de Clean Code, desacoplamiento y gestión óptima de VRAM.
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any
 
 from src.config import TranscriptionConfig
 from src.utils import (
@@ -24,10 +25,10 @@ logger = setup_logger("whisperx_pipeline")
 @dataclass
 class TranscriptionResult:
     """Resultado estructurado de un proceso de transcripción."""
-    raw_segments: List[Dict[str, Any]]
+    raw_segments: list[dict[str, Any]]
     detected_language: str
     formatted_text: str
-    output_path: Optional[Path] = None
+    output_path: Path | None = None
 
 
 class WhisperXPipeline:
@@ -54,9 +55,9 @@ class WhisperXPipeline:
 
     def process(
         self,
-        media_path: Union[str, Path],
-        output_dir: Optional[Union[str, Path]] = None,
-        progress_callback: Optional[Callable[[float, str], None]] = None
+        media_path: str | Path,
+        output_dir: str | Path | None = None,
+        progress_callback: Callable[[float, str], None] | None = None
     ) -> TranscriptionResult:
         """
         Ejecuta el pipeline completo sobre el archivo de audio o video provisto.
@@ -137,7 +138,7 @@ class WhisperXPipeline:
 
             # --- FASE 5: Generación y Escritura del Archivo Final ---
             notify(0.90, "Generando archivo de transcripción...")
-            formatted_lines: List[str] = []
+            formatted_lines: list[str] = []
             for seg in segments:
                 text = seg.get("text", "")
                 start = seg.get("start", 0.0)
