@@ -114,15 +114,30 @@ La identificación de interlocutores requiere el modelo `pyannote/speaker-diariz
    # Editar .env y colocar:
    HF_TOKEN=hf_tu_token_aqui
    ```
-   *También puedes pasarlo como argumento `--token` en la CLI o introducirlo en el campo correspondiente en la Web UI.*
+   *También puedes pasarlo como argumento `--token` en la CLI.*
+
+---
+
+## Modos de Ejecución: Nube vs. Local
+
+| Modo | Ideal para | Ventajas Principales | Limitaciones |
+|---|---|---|---|
+| **Hugging Face Spaces (Nube)** | Audios cortos y medianos (< 20-30 min), acceso inmediato | Cero instalación; corre en GPU NVIDIA A10G (24GB VRAM) en la nube | Sujeto a cuotas diarias gratuitas de ZeroGPU |
+| **Ejecución Local (PC)** | Grabaciones largas (1 a 5+ horas), lotes masivos, audios confidenciales | Sin límites de tiempo, 100% privado y offline | Utiliza hardware local (GPU/CPU) |
 
 ---
 
 ## Guía de Uso
 
-### 1. Interfaz Web (Gradio)
+### 1. Lanzador Rápido en Windows (1 Clic)
 
-Lanza el servidor local con:
+Haz doble clic en `run_transcriptor.bat` en la raíz del proyecto (o ejecútalo desde terminal). Detecta y activa el entorno Conda automáticamente y abre la ventana gráfica para elegir tu archivo.
+
+---
+
+### 2. Interfaz Web Local (Gradio)
+
+Lanza la misma interfaz web directamente en tu máquina:
 
 ```bash
 python app.py
@@ -131,7 +146,7 @@ Abre tu navegador en `http://127.0.0.1:7860` para usar la interfaz visual.
 
 ---
 
-### 2. Interfaz de Línea de Comandos (CLI)
+### 3. Interfaz de Línea de Comandos (CLI)
 
 ```bash
 # Modo interactivo (abre ventana gráfica para elegir el archivo si no pasas -i):

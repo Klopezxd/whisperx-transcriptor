@@ -104,9 +104,26 @@ Speaker diarization leverages gated models from Pyannote. To enable it:
 
 ---
 
+## Execution Modes: Cloud vs. Local
+
+| Execution Mode | Best For | Key Advantage | Constraints |
+|---|---|---|---|
+| **Hugging Face Spaces (Cloud)** | Short-to-medium files (< 20-30 mins), instant access | Zero install; runs on cloud NVIDIA A10G (24GB VRAM) | Subject to daily ZeroGPU community quotas |
+| **Local Execution (PC)** | Long recordings (1 to 5+ hours), batch jobs, private/sensitive data | Unlimited processing time, 100% offline privacy | Uses local machine hardware (GPU/CPU) |
+
+---
+
 ## Usage
 
-### 1. Web Application
+### 1. Windows One-Click Launcher (Desktop)
+
+Double-click `run_transcriptor.bat` in the project root (or run it via terminal). It automatically activates the `transcriptor` environment and opens the graphical file picker dialog.
+
+---
+
+### 2. Local Web Application (Gradio)
+
+Run the full interactive web application locally on your machine:
 
 ```bash
 python app.py
@@ -115,7 +132,7 @@ Navigate to `http://127.0.0.1:7860` in any modern web browser.
 
 ---
 
-### 2. Command Line Interface (CLI)
+### 3. Command Line Interface (CLI)
 
 ```bash
 # Interactive mode (opens file selection dialog if no -i argument is provided):
