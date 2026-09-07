@@ -39,10 +39,13 @@ def process_transcription(
     enable_diarization: bool,
     timestamp_option: str,
     progress=gr.Progress(),
-) -> tuple[str, str | None]:
-    """Procesa el archivo multimedia y retorna el texto y la ruta del archivo generado."""
+):
+    """Procesa el archivo multimedia y retorna el texto y el componente de descarga."""
     if not media_file:
-        return "⚠️ Por favor selecciona o arrastra un archivo de audio o video.", None
+        return (
+            "⚠️ Por favor selecciona o arrastra un archivo de audio o video.",
+            gr.DownloadButton(label="Descargar Documento (.txt)", value=None, interactive=False),
+        )
 
     media_path = media_file.name if hasattr(media_file, "name") else str(media_file)
 
@@ -61,7 +64,7 @@ def process_transcription(
             "⚠️ La identificación de hablantes (diarización) requiere configurar 'HF_TOKEN' "
             "en las variables de entorno o Secrets del servidor.\n\n"
             "Consejo: Desmarca la casilla de diarización para transcribir directamente con Whisper.",
-            None,
+            gr.DownloadButton(label="Descargar Documento (.txt)", value=None, interactive=False),
         )
 
     def on_progress(p: float, msg: str) -> None:
@@ -81,16 +84,29 @@ def process_transcription(
             progress_callback=on_progress,
         )
 
-        return result.formatted_text, str(result.output_path)
+        return (
+            result.formatted_text,
+            gr.DownloadButton(
+                label=f"Descargar {result.output_path.name}",
+                value=str(result.output_path),
+                interactive=True,
+            ),
+        )
 
     except TranscriptionError as e:
         clear_gpu_vram()
         logger.error("Error en procesamiento web: %s", e)
-        return f"❌ Error de transcripción: {e}", None
+        return (
+            f"❌ Error de transcripción: {e}",
+            gr.DownloadButton(label="Descargar Documento (.txt)", value=None, interactive=False),
+        )
     except Exception as e:
         clear_gpu_vram()
         logger.exception("Error inesperado en app web")
-        return f"❌ Ocurrió un error inesperado durante el procesamiento: {e}", None
+        return (
+            f"❌ Ocurrió un error inesperado durante el procesamiento: {e}",
+            gr.DownloadButton(label="Descargar Documento (.txt)", value=None, interactive=False),
+        )
 
 
 # Estilos CSS y Tema visual refinado (adaptable a escritorio y móvil)
@@ -230,15 +246,22 @@ with gr.Blocks(**blocks_kwargs) as demo:
             output_text = gr.Textbox(
                 label="Resultado de la Transcripción",
                 placeholder="El texto transcrito aparecerá aquí...",
-                lines=12,
+                lines=14,
             )
-            download_file = gr.File(
+            download_file = gr.DownloadButton(
                 label="Descargar Documento (.txt)",
+                value=None,
                 interactive=False,
+                size="lg",
+                variant="secondary",
             )
 
     # Conexión de eventos
-    btn_clear.add([input_media, output_text, download_file])
+    btn_clear.add([input_media, output_text])
+    btn_clear.click(
+        fn=lambda: gr.DownloadButton(label="Descargar Documento (.txt)", value=None, interactive=False),
+        outputs=download_file,
+    )
 
     btn_transcribe.click(
         fn=process_transcription,
